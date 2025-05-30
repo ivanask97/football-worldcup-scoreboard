@@ -1,5 +1,9 @@
 package com.ivana.scoreboard;
 
+/**
+ * Represents a football match between two teams.
+ * Tracks team names, scores, and start time.
+ */
 public class FootballMatch {
     private final String homeTeam;
     private final String awayTeam;
@@ -7,12 +11,41 @@ public class FootballMatch {
     private int awayScore;
     private final long startTime;
 
+    private String normalizeTeamName(String name) {
+        return name == null ? null : name.trim();
+    }
+
+    private void validateTeam(String teamName) {
+        if(teamName==null || teamName.isEmpty())
+            throw new IllegalArgumentException("Team name can not be null or empty");
+    }
+
+    private void isSameTeam(String homeTeam, String awayTeam){
+        if(homeTeam.equalsIgnoreCase(awayTeam))
+            throw new IllegalArgumentException("Team names can not be the same");
+    }
+
+    /**
+     * Creates a new FootballMatch with given teams, sets their initial scores to 0 and sets start time.
+     *
+     * @param homeTeam Name of the home team (non-null, non-empty, trimmed)
+     * @param awayTeam Name of the away team (non-null, non-empty, trimmed, different from home team)
+     * @throws IllegalArgumentException if validation fails
+     */
+
     public FootballMatch(String homeTeam, String awayTeam) {
+        homeTeam = normalizeTeamName(homeTeam);
+        awayTeam = normalizeTeamName(awayTeam);
+
+        validateTeam(homeTeam);
+        validateTeam(awayTeam);
+        isSameTeam(homeTeam, awayTeam);
+
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
-        this.awayScore=0;
-        this.homeScore=0;
-        this.startTime=System.currentTimeMillis();
+        this.awayScore = 0;
+        this.homeScore = 0;
+        this.startTime = System.currentTimeMillis();
     }
 
     public String getHomeTeam() {
