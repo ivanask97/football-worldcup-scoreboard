@@ -122,15 +122,13 @@ public class Scoreboard {
      */
     public List<String> getSummary() {
         AtomicInteger insertionOrder = new AtomicInteger(0);
-
         return scoreboard.values().stream()
                 .map(footballMatch -> new Object() {
                     final FootballMatch match = footballMatch;
                     final int order = insertionOrder.getAndIncrement();
-                    final int totalScore = footballMatch.getTotalScore();
                 })
                 .sorted((obj1, obj2) -> {
-                    int scoreComp = Integer.compare(obj2.totalScore, obj1.totalScore);
+                    int scoreComp = obj1.match.compareTo(obj2.match);
                     if (scoreComp != 0) {
                         return scoreComp;
                     }

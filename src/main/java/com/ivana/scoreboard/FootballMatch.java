@@ -4,7 +4,7 @@ package com.ivana.scoreboard;
  * Represents a football match between two teams.
  * Tracks team names, scores, and start time.
  */
-public class FootballMatch {
+public class FootballMatch implements Comparable<FootballMatch> {
     private final String homeTeam;
     private final String awayTeam;
     private int homeScore;
@@ -70,7 +70,12 @@ public class FootballMatch {
         this.awayScore = awayScore;
     }
 
-    public int getTotalScore(){
+    private int getTotalScore(){
         return this.homeScore + this.awayScore;
+    }
+
+    @Override
+    public int compareTo(FootballMatch other) {
+        return Integer.compare(other.getTotalScore(), this.getTotalScore());
     }
 }

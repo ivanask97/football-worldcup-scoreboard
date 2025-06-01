@@ -99,13 +99,13 @@ Match States
 
 ## Additional notes
 
-Since this is a simple Java library designed primarily to support a live Football World Cup scoreboard, the `FootballMatch` class is implemented as a regular class rather than an interface or abstract class. If the project were to support multiple types of matches (e.g., basketball, rugby, etc.), we would introduce a `Match` interface or Match as abstract class, which different match types would implement or extend.
+Since this is a simple Java library designed primarily to support a live Football World Cup scoreboard, the `FootballMatch` class is implemented as a regular class rather than an interface or abstract class. If the project were to support multiple types of matches (e.g., basketball, rugby, etc.), we would introduce a `Match` as abstract class, which different match types could extend.
 
 Given the current scope, focusing mainly on the scoreboard functionality for football matches, this design keeps things straightforward and easy to maintain.
 
 In further development, there would also be a `Team` class, where each team would be represented and classified. However, for simplicity, this is not currently implemented.
 
-For the `Scoreboard` class, an additional interface could be introduced to define all the necessary methods that a `Scoreboard` implementation should support. This would allow flexibility to implement different types of scoreboards (e.g., in-memory or remote storage) while adhering to a consistent contract.
+For the `Scoreboard` class, an additional interface could be introduced to define all the necessary methods that a `Scoreboard` implementation should implement and support. This would allow flexibility to implement different types of scoreboards (e.g., in-memory or remote storage) while adhering to a consistent contract.
 
 
 ### Team name validation
