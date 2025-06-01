@@ -1,7 +1,6 @@
 package com.ivana.scoreboard;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class Scoreboard {
     private final LinkedHashMap<String, FootballMatch> scoreboard;
@@ -12,8 +11,12 @@ public class Scoreboard {
         this.activeTeams = new HashSet<>();
     }
 
-    public LinkedHashMap<String, FootballMatch> getScoreboard() {
-        return scoreboard;
+    public Set<String> getActiveTeams() {
+        return Collections.unmodifiableSet(new HashSet<>(activeTeams));
+    }
+
+    public Map<String, FootballMatch> getScoreboard() {
+        return Collections.unmodifiableMap(new LinkedHashMap<>(scoreboard));
     }
     private boolean isTeamInActiveMatch(String teamName){
         String teamNameNormalize =  teamName.trim().toLowerCase();
@@ -54,7 +57,17 @@ public class Scoreboard {
             match.setHomeScore(homeScore);
             match.setAwayScore(awayScore);
         }else{
-            throw new IllegalStateException("This match does not exist");
+            throw new IllegalStateException("Can not update match that doesn't exist");
+        }
+    }
+    public void finishMatch(String homeTeam, String awayTeam){
+        String matchKey = createMatchKey(homeTeam,awayTeam);
+        if (scoreboard.containsKey(matchKey)){
+            scoreboard.remove(matchKey);
+            activeTeams.remove(homeTeam.trim().toLowerCase());
+            activeTeams.remove(awayTeam.trim().toLowerCase());
+        }else{
+            throw new IllegalStateException("Can not finish the match that is not ongoing");
         }
     }
 }

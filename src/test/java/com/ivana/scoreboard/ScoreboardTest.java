@@ -61,7 +61,7 @@ class ScoreboardTest {
         Exception exception = assertThrows(IllegalStateException.class, () ->
                 scoreboard.updateScore("Germany", "France", 3, 2));
 
-        assertEquals("This match does not exist", exception.getMessage());
+        assertEquals("Can not update match that doesn't exist", exception.getMessage());
     }
 
     @Test
@@ -120,4 +120,49 @@ class ScoreboardTest {
         assertEquals(100, match.getAwayScore());
     }
 
+    @Test
+    @DisplayName("Finish match method should remove match from scoreboard and teams from active teams successufully")
+    void finishMatch_shouldRemoveMatchAndTeamsSuccessfully() {
+        scoreboard.startMatch("Brazil", "Croatia");
+
+        scoreboard.finishMatch("Brazil", "Croatia");
+
+        assertFalse(scoreboard.getScoreboard().containsKey("brazil_vs_croatia"));
+        assertFalse(scoreboard.getActiveTeams().contains("brazil"));
+        assertFalse(scoreboard.getActiveTeams().contains("croatia"));
+    }
+
+    @Test
+    @DisplayName("Finish match method should be case insensitive and trimmed")
+    void finishMatch_shouldBeCaseInsensitiveAndTrimmed() {
+        scoreboard.startMatch("  Brazil ", " Croatia ");
+
+        scoreboard.finishMatch("brazil", "CROATIA");
+
+        assertFalse(scoreboard.getScoreboard().containsKey("brazil_vs_croatia"));
+        assertFalse(scoreboard.getActiveTeams().contains("brazil"));
+        assertFalse(scoreboard.getActiveTeams().contains("croatia"));
+    }
+
+    @Test
+    @DisplayName("Finish match method should throw exception if match does not exists")
+    void finishMatch_shouldThrowExceptionIfMatchDoesNotExist() {
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () ->
+                scoreboard.finishMatch("Argentina", "Germany")
+        );
+
+        assertEquals("Can not finish the match that is not ongoing", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Finish match method should only remove given match")
+    void finishMatch_shouldOnlyRemoveGivenMatch() {
+        scoreboard.startMatch("Brazil", "Croatia");
+        scoreboard.startMatch("Spain", "France");
+
+        scoreboard.finishMatch("Brazil", "Croatia");
+
+        assertTrue(scoreboard.getScoreboard().containsKey("spain_vs_france"));
+        assertFalse(scoreboard.getScoreboard().containsKey("brazil_vs_croatia"));
+    }
 }
