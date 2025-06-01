@@ -1,6 +1,8 @@
 package com.ivana.scoreboard;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Scoreboard {
     private final LinkedHashMap<String, FootballMatch> scoreboard;
@@ -69,5 +71,28 @@ public class Scoreboard {
         }else{
             throw new IllegalStateException("Can not finish the match that is not ongoing");
         }
+    }
+    public List<String> getSummary() {
+        AtomicInteger insertionOrder = new AtomicInteger(0);
+
+        return scoreboard.values().stream()
+                .map(footballMatch -> new Object() {
+                    final FootballMatch match = footballMatch;
+                    final int order = insertionOrder.getAndIncrement();
+                    final int totalScore = footballMatch.getTotalScore();
+                })
+                .sorted((obj1, obj2) -> {
+                    int scoreComp = Integer.compare(obj2.totalScore, obj1.totalScore);
+                    if (scoreComp != 0) {
+                        return scoreComp;
+                    }
+                    return Integer.compare(obj2.order, obj1.order);
+                })
+                .map(obj -> {
+                    FootballMatch m = obj.match;
+                    return m.getHomeTeam() + " " + m.getHomeScore() + " - " +
+                            m.getAwayTeam() + " " + m.getAwayScore();
+                })
+                .collect(Collectors.toList());
     }
 }

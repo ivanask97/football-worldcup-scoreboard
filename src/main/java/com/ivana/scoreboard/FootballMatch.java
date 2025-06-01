@@ -75,4 +75,8 @@ public class FootballMatch {
     public void setAwayScore(int awayScore) {
         this.awayScore = awayScore;
     }
+
+    public int getTotalScore(){
+        return this.homeScore + this.awayScore;
+    }
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ScoreboardTest {
@@ -164,5 +165,120 @@ class ScoreboardTest {
 
         assertTrue(scoreboard.getScoreboard().containsKey("spain_vs_france"));
         assertFalse(scoreboard.getScoreboard().containsKey("brazil_vs_croatia"));
+    }
+
+    @Test
+    @DisplayName("Get summary method should return matchess sorted by the total score")
+    void getSummary_shouldReturnMatchesSortedByTotalScore() {
+        scoreboard.startMatch("Mexico", "Canada");
+        scoreboard.updateScore("Mexico", "Canada", 0, 5);
+
+        scoreboard.startMatch("Spain", "Brazil");
+        scoreboard.updateScore("Spain", "Brazil", 10, 2);
+
+        List<String> summary = scoreboard.getSummary();
+
+        assertEquals(2, summary.size());
+        assertEquals("Spain 10 - Brazil 2", summary.getFirst());
+        assertEquals("Mexico 0 - Canada 5", summary.get(1));
+    }
+
+    @Test
+    @DisplayName("Get summary method should give the most recently started mach if two matches have the same total result")
+    void getSummary_shouldBreakTiesByMostRecentlyStartedMatch() {
+        scoreboard.startMatch("Germany", "France");
+        scoreboard.updateScore("Germany", "France", 2, 2);
+
+        scoreboard.startMatch("Italy", "Portugal");
+        scoreboard.updateScore("Italy", "Portugal", 1, 3);
+
+        List<String> summary = scoreboard.getSummary();
+
+        assertEquals("Italy 1 - Portugal 3", summary.getFirst());
+        assertEquals("Germany 2 - France 2", summary.get(1));
+    }
+
+    @Test
+    @DisplayName("Get summary method should return Empty list if there is no ongoing matches")
+    void getSummary_shouldReturnEmptyListWhenNoMatches() {
+        List<String> summary = scoreboard.getSummary();
+        assertTrue(summary.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Get summary method should not show any match that already finished")
+    void getSummary_shouldNotIncludeFinishedMatches() {
+        scoreboard.startMatch("Argentina", "Chile");
+        scoreboard.updateScore("Argentina", "Chile", 2, 2);
+
+        scoreboard.finishMatch("Argentina", "Chile");
+
+        List<String> summary = scoreboard.getSummary();
+
+        assertTrue(summary.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Get summary method should treat names case insensitive and trimmed")
+    void getSummary_shouldTreatTeamNamesCaseInsensitivelyAndTrimmed() {
+        scoreboard.startMatch("  argentina", "Brazil  ");
+        scoreboard.updateScore("ARGENTINA", "brazil", 1, 1);
+
+        List<String> summary = scoreboard.getSummary();
+
+        assertEquals(1, summary.size());
+        assertEquals("argentina 1 - Brazil 1", summary.getFirst());
+    }
+
+    @Test
+    @DisplayName("Get summary method should still show ongoing matchesk that have starting results")
+    void getSummary_shouldIncludeMatchesWithZeroScore() {
+        scoreboard.startMatch("USA", "Canada");
+        scoreboard.updateScore("USA", "Canada", 0, 0);
+
+        List<String> summary = scoreboard.getSummary();
+
+        assertEquals(1, summary.size());
+        assertEquals("USA 0 - Canada 0", summary.getFirst());
+    }
+
+    @Test
+    @DisplayName("Get summary method should sort as many ongoing matches there are correctly")
+    void getSummary_shouldSortMultipleMatchesCorrectly() {
+        scoreboard.startMatch("Mexico", "Canada");
+        scoreboard.updateScore("Mexico", "Canada", 0, 5);
+
+        scoreboard.startMatch("Spain", "Brazil");
+        scoreboard.updateScore("Spain", "Brazil", 10, 2);
+
+        scoreboard.startMatch("Germany", "France");
+        scoreboard.updateScore("Germany", "France", 2, 2);
+
+        scoreboard.startMatch("Italy", "Portugal");
+        scoreboard.updateScore("Italy", "Portugal", 1, 3);
+
+        List<String> summary = scoreboard.getSummary();
+
+        assertEquals("Spain 10 - Brazil 2", summary.getFirst());
+        assertEquals("Mexico 0 - Canada 5", summary.get(1));
+        assertEquals("Italy 1 - Portugal 3", summary.get(2));
+        assertEquals("Germany 2 - France 2", summary.get(3));
+    }
+
+    @Test
+    @DisplayName("Get summary method should still keep track if matchess are updated regulary")
+    void getSummary_shouldReflectUpdatedScores() {
+        scoreboard.startMatch("Team A", "Team B");
+        scoreboard.updateScore("Team A", "Team B", 1, 1);
+
+        scoreboard.startMatch("Team C", "Team D");
+        scoreboard.updateScore("Team C", "Team D", 2, 1);
+
+        scoreboard.updateScore("Team A", "Team B", 3, 2);
+
+        List<String> summary = scoreboard.getSummary();
+
+        assertEquals("Team A 3 - Team B 2", summary.getFirst());
+        assertEquals("Team C 2 - Team D 1", summary.get(1));
     }
 }
