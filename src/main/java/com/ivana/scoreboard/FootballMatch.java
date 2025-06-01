@@ -9,7 +9,6 @@ public class FootballMatch {
     private final String awayTeam;
     private int homeScore;
     private int awayScore;
-    private final long startTime;
 
     private String normalizeTeamName(String name) {
         return name == null ? null : name.trim();
@@ -45,7 +44,6 @@ public class FootballMatch {
         this.awayTeam = awayTeam;
         this.awayScore = 0;
         this.homeScore = 0;
-        this.startTime = System.currentTimeMillis();
     }
 
     public String getHomeTeam() {
@@ -58,10 +56,6 @@ public class FootballMatch {
 
     public int getHomeScore() {
         return homeScore;
-    }
-
-    public long getStartTime() {
-        return startTime;
     }
 
     public int getAwayScore() {

@@ -17,20 +17,8 @@ class FootballMatchTest {
         assertEquals(awayTeam,match.getAwayTeam());
         assertEquals(0,match.getHomeScore());
         assertEquals(0,match.getAwayScore());
-        assertTrue(match.getStartTime()>0);
     }
 
-    @Test
-    @DisplayName("Should validate start time")
-    void shouldSetStartTimeToCurrentTime(){
-        long beforeCreationTime = System.currentTimeMillis();
-
-        FootballMatch match = new FootballMatch("Brazil", "Croatia");
-
-        long afterCreationTime = System.currentTimeMillis();
-
-        assertTrue(match.getStartTime()>=beforeCreationTime && match.getStartTime()<=afterCreationTime);
-    }
 
     @Test
     @DisplayName("Should throw exception when home team is null")
