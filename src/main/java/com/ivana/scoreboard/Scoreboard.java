@@ -5,9 +5,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class Scoreboard {
+    /**
+     * Map storing active matches, preserving insertion order for tie-breaking.
+     * Key format: "hometeam_vs_awayteam" (normalized to lowercase)
+     * Set of team names currently participating in active matches.
+     * Team names are normalized to lowercase for case-insensitive comparison.
+     */
     private final LinkedHashMap<String, FootballMatch> scoreboard;
     private final HashSet<String> activeTeams;
 
+    /**
+     * Constructs a new empty Scoreboard with no active matches.
+     */
     public Scoreboard() {
         this.scoreboard = new LinkedHashMap<>();
         this.activeTeams = new HashSet<>();
@@ -20,14 +29,34 @@ public class Scoreboard {
     public Map<String, FootballMatch> getScoreboard() {
         return Collections.unmodifiableMap(new LinkedHashMap<>(scoreboard));
     }
+    /**
+     * Checks if a team is currently participating in an active match.
+     * Comparison is case-insensitive and ignores whitespace.
+     *
+     * @param teamName the name of the team to check
+     * @return true if the team is currently in an active match, if not it returns false
+     */
     private boolean isTeamInActiveMatch(String teamName){
         String teamNameNormalize =  teamName.trim().toLowerCase();
         return this.activeTeams.contains(teamNameNormalize);
     }
+
+    /**
+     * Creates a unique match identifier key from home and away team names. Names are trimmed and lower cased
+     *
+     * @param homeTeam the home team name
+     * @param awayTeam the away team name
+     * @return formatted match key in the format "hometeam_vs_awayteam"
+     */
     private String createMatchKey(String homeTeam, String awayTeam) {
         return homeTeam.trim().toLowerCase() + "_vs_" + awayTeam.trim().toLowerCase();
     }
 
+
+    /**
+     * Starts a new football match between the specified teams.
+     * Both teams must not be currently participating in any other active matches.
+     */
     public void startMatch(String homeTeam, String awayTeam){
         String matchKey = createMatchKey(homeTeam,awayTeam);
         if (scoreboard.containsKey(matchKey)){
@@ -41,6 +70,11 @@ public class Scoreboard {
         activeTeams.add(homeTeam.trim().toLowerCase());
         activeTeams.add(awayTeam.trim().toLowerCase());
     }
+
+    /**
+     * Validates that a score value is within acceptable range.
+     * Scores must be non-negative and not exceed 100 (since 100 to score in one ongoing match is unrealisitic).
+     */
     private void validateScore(int score){
         if(score < 0){
             throw new IllegalArgumentException("Score can not be a negative number");
@@ -50,6 +84,10 @@ public class Scoreboard {
         }
 
     }
+
+    /**
+     * Updates the score for an existing ongoing match.
+     */
     public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore){
         String matchKey = createMatchKey(homeTeam,awayTeam);
         if (scoreboard.containsKey(matchKey)){
@@ -62,6 +100,10 @@ public class Scoreboard {
             throw new IllegalStateException("Can not update match that doesn't exist");
         }
     }
+
+    /**
+     * Finishes ongoing match and removes it from the scoreboard.
+     */
     public void finishMatch(String homeTeam, String awayTeam){
         String matchKey = createMatchKey(homeTeam,awayTeam);
         if (scoreboard.containsKey(matchKey)){
@@ -72,6 +114,12 @@ public class Scoreboard {
             throw new IllegalStateException("Can not finish the match that is not ongoing");
         }
     }
+
+
+    /**
+     * Generates a summary of all active matches, sorted first by the highest total score,
+     * but if there is a tie than the match tthat started the most recently is going to be shown first
+     */
     public List<String> getSummary() {
         AtomicInteger insertionOrder = new AtomicInteger(0);
 
