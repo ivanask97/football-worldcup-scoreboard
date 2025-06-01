@@ -36,4 +36,25 @@ public class Scoreboard {
         activeTeams.add(homeTeam.trim().toLowerCase());
         activeTeams.add(awayTeam.trim().toLowerCase());
     }
+    private void validateScore(int score){
+        if(score < 0){
+            throw new IllegalArgumentException("Score can not be a negative number");
+        }
+        if (score > 100) {
+            throw new IllegalArgumentException("Score number seems unrealistic, check the score input");
+        }
+
+    }
+    public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore){
+        String matchKey = createMatchKey(homeTeam,awayTeam);
+        if (scoreboard.containsKey(matchKey)){
+            FootballMatch match = scoreboard.get(matchKey);
+            validateScore(homeScore);
+            validateScore(awayScore);
+            match.setHomeScore(homeScore);
+            match.setAwayScore(awayScore);
+        }else{
+            throw new IllegalStateException("This match does not exist");
+        }
+    }
 }
